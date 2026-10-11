@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<title>Experiment progress</title>
+<link rel="stylesheet" href="/static/dashboard.css">
+</head>
+<body>
+<header class="page-head">
+  <div>
+    <h1>Experiment progress</h1>
+    <p class="subtitle" id="subtitle">Loading&hellip;</p>
+  </div>
+</header>
+
+<form class="filters" id="filters" onsubmit="return false">
+  <label class="check"><input type="checkbox" id="participants-only" checked>
+    <span>Participants only</span></label>
+  <span class="filter-note" id="participants-note"></span>
+  <button type="button" id="refresh">Refresh</button>
+</form>
+
+<div id="banner" class="banner" role="alert" hidden></div>
+
+<main id="content" class="loading">
+  <section class="kpis" id="kpis" aria-label="Headline numbers"></section>
+
+  <section class="grid">
+    <article class="card wide" id="card-days">
+      <header><h2>Cases opened per day</h2><p>UTC days, by experiment pack</p></header>
+      <div class="chart-area"></div>
+    </article>
+    <article class="card" id="card-progress">
+      <header><h2>Progress per participant</h2><p>Cases opened; the first ones are practice</p></header>
+      <div class="chart-area scroll"></div>
+    </article>
+    <article class="card" id="card-turns">
+      <header><h2>Length of student turns</h2><p>Words per turn the student typed</p></header>
+      <div class="chart-area"></div>
+    </article>
+    <article class="card" id="card-origin">
+      <header><h2>Where students come from</h2><p>Session timezone</p></header>
+      <div class="chart-area"></div>
+    </article>
+    <article class="card" id="card-guess">
+      <header><h2>Defense guesses</h2><p>Share guessed right, by the case&rsquo;s defense</p></header>
+      <div class="chart-area"></div>
+    </article>
+    <article class="card wide" id="card-models">
+      <header><h2>Model response time</h2><p>Seconds per completion</p></header>
+      <div class="chart-area"></div>
+    </article>
+  </section>
+
+  <section class="notes" id="notes" aria-label="Data notes"></section>
+</main>
+
+<div id="tooltip" class="tooltip" role="status" hidden></div>
+<script src="/static/vendor/d3.min.js"></script>
+<script src="/static/dashboard.js"></script>
+</body>
+</html>

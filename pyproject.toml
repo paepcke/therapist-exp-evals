@@ -1,0 +1,32 @@
+# **********************************************************
+# @Author: Andreas Paepcke
+# @Date:   2026-10-11 09:54:50
+# @File:   /Users/paepcke/VSCodeWorkspaces/therapist-exp-evals/pyproject.toml
+# @Last Modified by:   Andreas Paepcke
+# @Last Modified time: 2026-10-11 09:54:50
+# **********************************************************
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "therapist-exp-evals"
+version = "0.1.0"
+description = "Log analysis, usage dashboard and student evaluation service for the ISTDP therapist trainer."
+requires-python = ">=3.11"
+dependencies = [
+    "tornado>=6.4.2",
+    "pandas>=2.1",
+    "numpy>=1.26",
+    "tzdata",
+]
+
+[project.optional-dependencies]
+dev = ["pytest"]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+log_dashboard = ["static/*", "static/vendor/*"]

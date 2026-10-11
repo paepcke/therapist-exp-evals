@@ -1,0 +1,16 @@
+# **********************************************************
+# @Author: Andreas Paepcke
+# @Date:   2026-10-11 09:54:50
+# @File:   /Users/paepcke/VSCodeWorkspaces/therapist-exp-evals/deploy/Caddyfile.logdash
+# @Last Modified by:   Andreas Paepcke
+# @Last Modified time: 2026-10-11 09:54:50
+# **********************************************************
+
+# ADD this block to /etc/caddy/Caddyfile (do not replace the file: it holds
+# the existing gallery site). Then: sudo caddy validate --config /etc/caddy/Caddyfile
+# && sudo systemctl reload caddy
+dash.149-28-212-36.sslip.io {
+    encode gzip
+    header Strict-Transport-Security "max-age=31536000"
+    reverse_proxy 127.0.0.1:8081
+}

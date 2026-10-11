@@ -1,0 +1,37 @@
+# **********************************************************
+# @Author: Andreas Paepcke
+# @Date:   2026-10-11 09:54:50
+# @File:   /Users/paepcke/VSCodeWorkspaces/therapist-exp-evals/deploy/thtrainer-logdash.service
+# @Last Modified by:   Andreas Paepcke
+# @Last Modified time: 2026-10-11 09:54:50
+# **********************************************************
+
+[Unit]
+Description=ISTDP trainer usage dashboard (read-only)
+After=network.target
+
+[Service]
+User=logdash
+Group=logdash
+WorkingDirectory=/opt/therapist-exp-evals
+ExecStart=/opt/conda/envs/exp-evals/bin/python -m log_dashboard.dashboard_server \
+    --log-dir /srv/thdata/inbox/logs --auth-file /srv/logdash/auth.txt \
+    --bind 127.0.0.1 --port 8081
+Restart=on-failure
+RestartSec=5
+
+NoNewPrivileges=yes
+ProtectSystem=strict
+ProtectHome=yes
+PrivateTmp=yes
+PrivateDevices=yes
+ProtectKernelTunables=yes
+ProtectControlGroups=yes
+RestrictSUIDSGID=yes
+RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX
+CapabilityBoundingSet=
+SystemCallFilter=@system-service
+ReadOnlyPaths=/srv/thdata/inbox/logs /srv/logdash
+
+[Install]
+WantedBy=multi-user.target
