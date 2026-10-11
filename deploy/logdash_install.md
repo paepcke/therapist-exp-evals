@@ -12,19 +12,19 @@ in the `therapist` repo).
 
         sudo install -d -o $USER -g $USER /opt/therapist-exp-evals
         git clone git@github.com:<you>/therapist-exp-evals.git /opt/therapist-exp-evals
-        conda create -n exp-evals python=3.11 && conda activate exp-evals
+        conda create -n therapist-exp-evals python=3.11 && conda activate therapist-exp-evals
         cd /opt/therapist-exp-evals && pip install -e .
 
     The `logdash` service account only reads the code and the env, so both must be
     world-readable (`/opt/therapist-exp-evals` and the env's directory; check with
     `sudo -u logdash /path/to/env/bin/python -c "import log_dashboard"`).
-    Adjust `ExecStart` in the unit if the env lives elsewhere than `/opt/conda/envs/exp-evals`.
+    Adjust `ExecStart` in the unit if the env lives elsewhere than `/opt/conda/envs/therapist-exp-evals`.
 
 2. Account and password:
 
         sudo useradd --system --home /srv/logdash --shell /usr/sbin/nologin logdash
         sudo install -d -o logdash -g logdash -m 750 /srv/logdash
-        sudo -u logdash /opt/conda/envs/exp-evals/bin/python -m log_dashboard.password_file --file /srv/logdash/auth.txt --user <name>
+        sudo -u logdash /opt/conda/envs/therapist-exp-evals/bin/python -m log_dashboard.password_file --file /srv/logdash/auth.txt --user <name>
 
     The `logdash` account must be able to read `/srv/thdata/inbox/logs` (group read; it never writes there).
 
