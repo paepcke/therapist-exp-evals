@@ -14,7 +14,7 @@ After=network.target
 User=logdash
 Group=logdash
 WorkingDirectory=/opt/therapist-exp-evals
-ExecStart=/opt/conda/envs/exp-evals/bin/python -m log_dashboard.dashboard_server \
+ExecStart=/opt/conda/envs/therapist-exp-evals/bin/python -m log_dashboard.dashboard_server \
     --log-dir /srv/thdata/inbox/logs --auth-file /srv/logdash/auth.txt \
     --bind 127.0.0.1 --port 8081
 Restart=on-failure
