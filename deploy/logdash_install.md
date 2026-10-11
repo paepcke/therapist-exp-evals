@@ -26,7 +26,9 @@ in the `therapist` repo).
         sudo install -d -o logdash -g logdash -m 750 /srv/logdash
         sudo -u logdash /opt/conda/envs/therapist-exp-evals/bin/python -m log_dashboard.password_file --file /srv/logdash/auth.txt --user <name>
    
-    The `logdash` account must be able to read `/srv/thdata/inbox/logs` (group read; it never writes there).
+   The last line has you create a uid and pwd for seeing the experiment dash. I chose 'paepcke', and the usual deutsche Bahn pwd.
+   
+   The `logdash` account must be able to read `/srv/thdata/inbox/logs` (group read; it never writes there).
 
 3. Service:
    
