@@ -26,7 +26,7 @@ in the `therapist` repo).
         sudo install -d -o logdash -g logdash -m 750 /srv/logdash
         sudo -u logdash /opt/conda/envs/therapist-exp-evals/bin/python -m log_dashboard.password_file --file /srv/logdash/auth.txt --user <name>
    
-   The last line has you create a uid and pwd for seeing the experiment dash. I chose 'paepcke', and the usual deutsche Bahn pwd.
+   The last line has you create a uid and pwd for seeing the experiment dash. I chose 'paepcke'. The pwd is in 1Password in the Vultr Machine Instance entry under 'logdash experiment monitoring Web password.
    
    The `logdash` account must be able to read `/srv/thdata/inbox/logs` (group read; it never writes there).
 
