@@ -1,0 +1,17 @@
+{
+  "milestones": [
+    {"id": "q1", "label": "After the first weekend", "opens": "2026-11-15"},
+    {"id": "q2", "label": "After the second weekend", "opens": "2027-02-14"}
+  ],
+  "cohorts": [
+    {
+      "id": "A",
+      "name": "Cohort A",
+      "instructors": ["jon@example.org"],
+      "students": [
+        {"email": "student1@example.org", "name": "Student One"},
+        {"email": "student2@example.org", "name": "Student Two"}
+      ]
+    }
+  ]
+}

@@ -1,0 +1,38 @@
+# **********************************************************
+# @Author: Andreas Paepcke
+# @Date:   2026-10-11 16:48:20
+# @File:   /Users/paepcke/VSCodeWorkspaces/therapist-exp-evals/deploy/thtrainer-evals.service
+# @Last Modified by:   Andreas Paepcke
+# @Last Modified time: 2026-10-11 16:48:20
+# **********************************************************
+
+[Unit]
+Description=ISTDP trainer evaluation service (ratings by evaluators and students)
+After=network.target
+
+[Service]
+User=evals
+Group=evals
+WorkingDirectory=/opt/therapist-exp-evals
+ExecStart=/opt/conda/envs/therapist-exp-evals/bin/python -m evals_service.evals_server \
+    --service-root /srv/evals --inbox /srv/thdata/inbox/evals \
+    --bind 127.0.0.1 --port 8082
+Restart=on-failure
+RestartSec=5
+
+NoNewPrivileges=yes
+ProtectSystem=strict
+ProtectHome=yes
+PrivateTmp=yes
+PrivateDevices=yes
+ProtectKernelTunables=yes
+ProtectControlGroups=yes
+RestrictSUIDSGID=yes
+RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX
+CapabilityBoundingSet=
+SystemCallFilter=@system-service
+ReadOnlyPaths=/srv/thdata/inbox/evals
+ReadWritePaths=/srv/evals
+
+[Install]
+WantedBy=multi-user.target

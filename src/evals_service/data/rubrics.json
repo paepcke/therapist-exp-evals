@@ -1,0 +1,182 @@
+{
+  "version": "2026-10-11",
+  "instructions": {
+    "title": "Instructions for use",
+    "items": [
+      {"label": "Purpose", "text": "This rubric serves as a guide for supervisors and instructors to provide structured, objective, and actionable feedback to ISTDP students. It highlights areas of strength and areas requiring further development."},
+      {"label": "Evidence-based", "text": "Ratings should be supported by specific examples from session recordings (audio/video) or process notes."},
+      {"label": "Developmental perspective", "text": "Remember that students are in a learning process. The rubric is a tool for growth, not just a summative evaluation."},
+      {"label": "Discussion", "text": "The rubric should be used as a basis for a collaborative discussion between the student and supervisor, fostering self-reflection and targeted learning goals."},
+      {"label": "Holistic view", "text": "While individual dimensions are rated, consider the overall dynamic and how different skills interact within a session."}
+    ]
+  },
+  "rubrics": {
+    "student": {
+      "title": "Student skills",
+      "scale": {"min": 1, "max": 10, "na_allowed": false},
+      "items": [
+        {
+          "id": "anxiety",
+          "name": "Anxiety Regulation & Management",
+          "definition": "The student's ability to accurately identify the patient's anxiety pathways (e.g., striated muscle, smooth muscle, cognitive-perceptual disruption) and effectively intervene to regulate anxiety, facilitating a shift towards emotional experiencing.",
+          "bands": [
+            {"min": 1, "max": 2, "label": "Unsatisfactory", "text": "Fails to identify anxiety or exacerbates it; Interventions are counterproductive or absent."},
+            {"min": 3, "max": 4, "label": "Needs Significant Improvement", "text": "Inconsistently identifies anxiety; Interventions are often ineffective or poorly timed, leading to prolonged dysregulation."},
+            {"min": 5, "max": 6, "label": "Competent", "text": "Generally identifies anxiety and its pathways; Attempts regulation, but may miss opportunities or struggle with persistent high anxiety."},
+            {"min": 7, "max": 8, "label": "Proficient", "text": "Consistently and accurately identifies anxiety; Effectively uses various techniques to regulate it, allowing for deeper emotional work."},
+            {"min": 9, "max": 10, "label": "Mastery", "text": "Highly skilled in rapid anxiety identification and regulation; Seamlessly integrates anxiety management into the therapeutic flow, even with highly anxious patients, enabling rapid access to the unconscious."}
+          ]
+        },
+        {
+          "id": "defenses",
+          "name": "Defense Identification & Restructuring",
+          "definition": "The student's capacity to recognize and clearly articulate the patient's various defenses (e.g., repressive, regressive, characterological) and to consistently, directly, and compassionately challenge these defenses to facilitate emotional experiencing.",
+          "bands": [
+            {"min": 1, "max": 2, "label": "Unsatisfactory", "text": "Fails to identify defenses or colludes with them; Interventions reinforce defensive patterns."},
+            {"min": 3, "max": 4, "label": "Needs Significant Improvement", "text": "Identifies some overt defenses but struggles with subtle ones; challenges are inconsistent, unclear, or easily bypassed by the patient."},
+            {"min": 5, "max": 6, "label": "Competent", "text": "Identifies common defenses; attempts to challenge them, but may lack precision, persistence, or struggle with complex or characterological defenses."},
+            {"min": 7, "max": 8, "label": "Proficient", "text": "Consistently and accurately identifies a wide range of defenses; Challenges are direct, persistent, and effective in helping the patient turn against their resistance."},
+            {"min": 9, "max": 10, "label": "Mastery", "text": "Exceptionally skilled in identifying even subtle and complex defenses; Challenges are precise, highly effective, and consistently lead to the patient's restructuring of defensive patterns and access to core feelings."}
+          ]
+        },
+        {
+          "id": "muta",
+          "name": "Mobilization of Unconscious Therapeutic Alliance (MUTA) & Pressure Application",
+          "definition": "The student's ability to help the patient mobilize their will to overcome resistance and turn against their own self-defeating patterns, often through direct, compassionate, and persistent therapeutic pressure. This includes facilitating the \"head-on collision.\"",
+          "bands": [
+            {"min": 1, "max": 2, "label": "Unsatisfactory", "text": "Fails to engage the patient's will; Avoids confrontation, leading to stagnation."},
+            {"min": 3, "max": 4, "label": "Needs Significant Improvement", "text": "Attempts to mobilize the patient but lacks conviction or persistence; Pressure is either too weak or inappropriately aggressive."},
+            {"min": 5, "max": 6, "label": "Competent", "text": "Understands the concept of MUTA; Makes efforts to engage the patient's will, but may struggle to maintain consistent pressure or facilitate a clear \"head-on collision.\""},
+            {"min": 7, "max": 8, "label": "Proficient", "text": "Consistently and effectively mobilizes the patient's unconscious therapeutic alliance; Applies appropriate and sustained pressure, leading to clear moments of the patient turning against resistance."},
+            {"min": 9, "max": 10, "label": "Mastery", "text": "Exceptional ability to mobilize the patient's will, even in highly resistant cases; Facilitates profound \"head-on collisions\" that lead to rapid and significant breakthroughs, demonstrating masterful use of pressure."}
+          ]
+        },
+        {
+          "id": "core_feelings",
+          "name": "Accessing & Processing Core Feelings",
+          "definition": "The student's skill in helping the patient identify, clarify, experience, and fully process core emotions (e.g., grief, rage, guilt, love) in their bodily manifestations, leading to emotional discharge and integration.",
+          "bands": [
+            {"min": 1, "max": 2, "label": "Unsatisfactory", "text": "Avoids or intellectualizes feelings; Fails to guide the patient to emotional experience."},
+            {"min": 3, "max": 4, "label": "Needs Significant Improvement", "text": "Recognizes emotions but struggles to help the patient access them deeply; interventions remain superficial or cognitive."},
+            {"min": 5, "max": 6, "label": "Competent", "text": "Guides the patient towards emotional experience, but may struggle with intensity, persistence, or helping the patient fully process and integrate the feelings."},
+            {"min": 7, "max": 8, "label": "Proficient", "text": "Consistently helps patients access and clarify core feelings; Guides them through the emotional processing with appropriate support and challenge, leading to significant emotional discharge."},
+            {"min": 9, "max": 10, "label": "Mastery", "text": "Highly skilled in facilitating deep emotional access and complete processing; helps patients experience and integrate complex emotional constellations, leading to profound and lasting therapeutic change."}
+          ]
+        },
+        {
+          "id": "transference",
+          "name": "Transference & Countertransference Management",
+          "definition": "The student's awareness and skillful utilization of transference phenomena to deepen the therapeutic process and address core conflicts, coupled with their ability to identify and manage their own countertransference reactions effectively.",
+          "bands": [
+            {"min": 1, "max": 2, "label": "Unsatisfactory", "text": "Unaware of transference or countertransference; Allows these dynamics to derail the therapy."},
+            {"min": 3, "max": 4, "label": "Needs Significant Improvement", "text": "Occasionally identifies overt transference but struggles to utilize it therapeutically; countertransference reactions are often unmanaged and interfere with interventions."},
+            {"min": 5, "max": 6, "label": "Competent", "text": "Identifies common transference patterns and attempts to address them; shows some awareness of countertransference but may struggle to fully regulate it."},
+            {"min": 7, "max": 8, "label": "Proficient", "text": "Consistently identifies and skillfully uses transference to advance the therapeutic work; demonstrates good self-awareness and effectively manages countertransference, maintaining therapeutic neutrality and effectiveness."},
+            {"min": 9, "max": 10, "label": "Mastery", "text": "Exceptional ability to identify subtle and complex transference patterns and utilize them as a powerful lever for change; maintains impeccable self-regulation, using countertransference as a diagnostic tool without it impeding the work."}
+          ]
+        },
+        {
+          "id": "pacing",
+          "name": "Pacing, Timing & Strategic Interventions",
+          "definition": "The student's judgment in pacing the session, timing interventions precisely, and making strategic choices that align with the patient's capacity and the overall therapeutic goals, including knowing when to escalate or de-escalate pressure.",
+          "bands": [
+            {"min": 1, "max": 2, "label": "Unsatisfactory", "text": "Poor pacing; interventions are consistently ill-timed, leading to patient overwhelm or stagnation."},
+            {"min": 3, "max": 4, "label": "Needs Significant Improvement", "text": "Pacing is erratic; interventions are often premature or delayed, missing critical therapeutic windows."},
+            {"min": 5, "max": 6, "label": "Competent", "text": "Generally maintains appropriate pacing; interventions are mostly well-timed, but there may be missed opportunities or moments of awkwardness."},
+            {"min": 7, "max": 8, "label": "Proficient", "text": "Consistently demonstrates good judgment in pacing and timing; interventions are strategically placed to maximize impact and facilitate progress."},
+            {"min": 9, "max": 10, "label": "Mastery", "text": "Masterful pacing and timing; interventions are precisely delivered, creating optimal conditions for breakthroughs and demonstrating a profound strategic understanding of the therapeutic process."}
+          ]
+        },
+        {
+          "id": "presence",
+          "name": "Therapist Presence & Self-Regulation",
+          "definition": "The student's ability to maintain a strong, emotionally available, and regulated presence in the session, even under challenging circumstances, demonstrating courage, compassion, and persistence. This includes managing their own emotional responses and maintaining focus.",
+          "bands": [
+            {"min": 1, "max": 2, "label": "Unsatisfactory", "text": "Appears disengaged, overwhelmed, or reactive; presence is detrimental to the therapeutic alliance."},
+            {"min": 3, "max": 4, "label": "Needs Significant Improvement", "text": "Presence is inconsistent; struggles with self-regulation under pressure, leading to hesitation or emotional leakage."},
+            {"min": 5, "max": 6, "label": "Competent", "text": "Generally maintains a stable and engaged presence; shows efforts at self-regulation but may occasionally falter in highly charged moments."},
+            {"min": 7, "max": 8, "label": "Proficient", "text": "Consistently maintains a strong, compassionate, and regulated presence; effectively manages personal reactions, remaining fully present and focused on the patient's process."},
+            {"min": 9, "max": 10, "label": "Mastery", "text": "Embodies exceptional therapist presence; consistently courageous, deeply compassionate, and impeccably self-regulated, serving as a powerful and steady anchor for the patient's emotional work."}
+          ]
+        },
+        {
+          "id": "diagnostic",
+          "name": "Diagnostic Acumen & Capacity Assessment",
+          "definition": "The student's ability to accurately assess the patient's ego strength, defense structure, anxiety tolerance, and overall capacity for emotional processing, using this assessment to tailor interventions appropriately and avoid overwhelming the patient.",
+          "bands": [
+            {"min": 1, "max": 2, "label": "Unsatisfactory", "text": "Fails to assess patient capacity; interventions are inappropriate for the patient's ego strength, leading to regression or withdrawal."},
+            {"min": 3, "max": 4, "label": "Needs Significant Improvement", "text": "Superficial assessment of capacity; interventions are sometimes mismatched, causing avoidable difficulties."},
+            {"min": 5, "max": 6, "label": "Competent", "text": "Makes a reasonable assessment of patient capacity; generally adapts interventions, but may misjudge nuances or struggle with complex presentations."},
+            {"min": 7, "max": 8, "label": "Proficient", "text": "Consistently and accurately assesses patient capacity; skillfully tailors interventions to the patient's specific needs and ego strength, optimizing therapeutic progress."},
+            {"min": 9, "max": 10, "label": "Mastery", "text": "Demonstrates exceptional diagnostic acumen; rapidly and precisely assesses patient capacity, allowing for highly individualized and effective interventions that maximize therapeutic gains while minimizing risk."}
+          ]
+        }
+      ]
+    },
+    "trainer": {
+      "title": "The Trainer AI",
+      "scale": {"min": 1, "max": 7, "na_allowed": false},
+      "items": [
+        {
+          "id": "vignette_quality",
+          "prompt": "Vignette quality: does the vignette set the stage for therapeutic goals?",
+          "anchors": ["Not at all", "Completely"],
+          "na_allowed": false
+        },
+        {
+          "id": "opening_defense",
+          "prompt": "Does the invented client opening statement reflect the trainer's intended client defense ({defense})?",
+          "anchors": ["Not at all", "Completely"],
+          "na_allowed": false
+        },
+        {
+          "id": "ai_as_client",
+          "prompt": "On average, when the trainer acts as **client**, are its statements useful for the student playing the therapist role?",
+          "anchors": ["Not useful", "Very useful"],
+          "na_allowed": true
+        },
+        {
+          "id": "ai_as_therapist",
+          "prompt": "On average, when the trainer acts as **therapist**, are its responses appropriate for ISTDP therapy?",
+          "anchors": ["Not appropriate", "Fully appropriate"],
+          "na_allowed": true
+        },
+        {
+          "id": "ai_as_advisor",
+          "prompt": "On average, when the student takes the role of advisee, and requests advice from the trainer, are the trainer's responses in its role as advisor appropriate?",
+          "anchors": ["Not appropriate", "Fully appropriate"],
+          "na_allowed": true
+        },
+        {
+          "id": "critique_correct",
+          "prompt": "How correct is the trainer's Session Critique?",
+          "anchors": ["Not correct", "Fully correct"],
+          "na_allowed": true
+        },
+        {
+          "id": "critique_useful",
+          "prompt": "How useful is the trainer's Session Critique?",
+          "anchors": ["Not useful", "Very useful"],
+          "na_allowed": true
+        }
+      ]
+    }
+  },
+  "forms": {
+    "instructor_assessment": {
+      "title": "Student skill assessment",
+      "blinded": false,
+      "sections": ["student"]
+    },
+    "self_assessment": {
+      "title": "Self-assessment",
+      "blinded": false,
+      "sections": ["student"]
+    },
+    "session_review": {
+      "title": "Session review",
+      "blinded": true,
+      "sections": ["student", "trainer"]
+    }
+  }
+}

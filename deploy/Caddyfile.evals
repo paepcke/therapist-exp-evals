@@ -1,0 +1,15 @@
+# **********************************************************
+# @Author: Andreas Paepcke
+# @Date:   2026-10-11 16:48:20
+# @File:   /Users/paepcke/VSCodeWorkspaces/therapist-exp-evals/deploy/Caddyfile.evals
+# @Last Modified by:   Andreas Paepcke
+# @Last Modified time: 2026-10-11 16:48:20
+# **********************************************************
+
+# ADD this block to /etc/caddy/Caddyfile (keep the existing sites). Then:
+# sudo caddy validate --config /etc/caddy/Caddyfile && sudo systemctl reload caddy
+rate.149-28-212-36.sslip.io {
+    encode gzip
+    header Strict-Transport-Security "max-age=31536000"
+    reverse_proxy 127.0.0.1:8082
+}

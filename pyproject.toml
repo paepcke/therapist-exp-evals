@@ -30,3 +30,4 @@ where = ["src"]
 
 [tool.setuptools.package-data]
 log_dashboard = ["static/*", "static/vendor/*"]
+evals_service = ["data/*.json", "static/*"]
