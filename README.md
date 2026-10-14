@@ -17,3 +17,6 @@ Contents (under `src/`):
   students' self-assessments, and blinded evaluations of student sessions with the trainer. Install
   steps are in `deploy/evals_install.md`. The sessions it shows come from the bundle builder in the
   `therapist` repository (`back_end/src/student_eval/bundle_builder.py`).
+* `backup_pull`: runs on the administrator's laptop. Pulls the evaluation snapshots from the cloud machine and the
+  pseudonym secret from the trainer's server every hour, verifies them, and sends a notification and an e-mail
+  when a backup is more than 48 hours old. Install steps: `deploy/backup_install.md`.

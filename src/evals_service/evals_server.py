@@ -3,7 +3,7 @@
 # @Date:   2026-10-11 16:46:16
 # @File:   /Users/paepcke/VSCodeWorkspaces/therapist-exp-evals/src/evals_service/evals_server.py
 # @Last Modified by:   Andreas Paepcke
-# @Last Modified time: 2026-10-11 16:46:16
+# @Last Modified time: 2026-10-13 17:26:44
 # **********************************************************
 
 '''
@@ -36,8 +36,6 @@ Run behind a reverse proxy that terminates TLS:
 
 import argparse
 import asyncio
-import csv
-import io
 import json
 import logging
 import mimetypes
@@ -366,18 +364,10 @@ class ExportHandler(ApiHandler):
     REQUIRED_ROLE = EvalsCommon.ROLE_ADMIN
 
     def get(self):
-        out = io.StringIO()
-        writer = csv.writer(out)
-        writer.writerow(['rater', 'rater_email', 'form', 'subject', 'section', 'item', 'value',
-                         'submitted_utc', 'rubric_version'])
-        for r in self.ctx.store.export_submitted():
-            for section, items in r['answers'].items():
-                for item, value in items.items():
-                    writer.writerow([r['rater_label'], r['rater_email'], r['form_kind'], r['subject_key'],
-                                     section, item, value, r['submitted_utc'], r['rubric_version']])
+        text = self.ctx.store.ratings_csv()
         self.set_header('Content-Type', 'text/csv; charset=UTF-8')
         self.set_header('Content-Disposition', 'attachment; filename="ratings.csv"')
-        self.finish(out.getvalue())
+        self.finish(text)
 
 
 class ServiceContext:

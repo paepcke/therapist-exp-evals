@@ -3,7 +3,7 @@
 # @Date:   2026-10-11 16:46:16
 # @File:   /Users/paepcke/VSCodeWorkspaces/therapist-exp-evals/src/evals_service/evals_common.py
 # @Last Modified by:   Andreas Paepcke
-# @Last Modified time: 2026-10-11 16:46:16
+# @Last Modified time: 2026-10-13 17:26:44
 # **********************************************************
 
 '''
@@ -112,3 +112,15 @@ class EvalsCommon:
 
     # Do not rescan the inbox for new bundles more often than this:
     BUNDLE_RESCAN_SECS = 15
+
+    # ------------------------- Backups -----------------------
+
+    # Snapshots of the database, written under the service root by evals_backup.py
+    # and pulled from there by the administrator's laptop:
+    BACKUP_DIR_NAME = 'backup'
+    BACKUP_KEEP = 14                       # snapshots kept on the server
+    BACKUP_LATEST_FILE = 'LATEST.json'     # names the newest complete snapshot
+    BACKUP_SNAPSHOT_FORMAT = 'evals-{stamp}.sqlite'
+    BACKUP_CSV_FORMAT = 'ratings-{stamp}.csv'
+    BACKUP_ROSTER_COPY = 'roster.json'
+    BACKUP_FORMAT_VERSION = 1

@@ -1,0 +1,30 @@
+{
+  "dest_root": "~/Backups/thtrainer",
+  "retry_after_hours": 12,
+  "alert_after_hours": 48,
+  "alert_repeat_hours": 24,
+  "mail": {
+    "smtp_host": "smtp.gmail.com",
+    "smtp_port": 587,
+    "user": "paepcke2000@gmail.com",
+    "keychain_service": "thtrainer-backup-smtp",
+    "to": "paepcke@cs.stanford.edu"
+  },
+  "sources": [
+    {
+      "name": "vultr-evals",
+      "remotes": ["evpull@149-28-212-36.sslip.io:/"],
+      "ssh_key": "~/.ssh/vultr_evals_backup",
+      "verify": "evals_snapshot",
+      "hint": "The cloud machine is reachable from anywhere, so look at it: ssh vultr 'systemctl status thtrainer-evals-backup.timer'."
+    },
+    {
+      "name": "quatro-secrets",
+      "remotes": [
+        "thtrainer@quatro.stanford.edu:.ssh/eval_pseudonym_secret.txt",
+        "thtrainer@quatro.stanford.edu:eval_state/sampling_state.json"
+      ],
+      "hint": "quatro is reachable only on the Stanford network. If you are at home, start the Stanford VPN; the next hourly run will then succeed."
+    }
+  ]
+}

@@ -3,7 +3,7 @@
 # @Date:   2026-10-11 16:46:16
 # @File:   /Users/paepcke/VSCodeWorkspaces/therapist-exp-evals/src/evals_service/eval_store.py
 # @Last Modified by:   Andreas Paepcke
-# @Last Modified time: 2026-10-11 16:46:16
+# @Last Modified time: 2026-10-13 17:26:44
 # **********************************************************
 
 '''
@@ -20,6 +20,8 @@ UPDATE and DELETE on it, no matter what the code does.
 All times are UTC, as ISO-8601 text.
 '''
 
+import csv
+import io
 import json
 import sqlite3
 import threading
@@ -444,6 +446,24 @@ class EvalStore:
                 'JOIN people p ON p.id = r.person_id WHERE r.state = ? ORDER BY r.id',
                 (EvalsCommon.STATE_SUBMITTED,)).fetchall()
         return [self._decode(dict(r)) for r in rows]
+
+    EXPORT_HEADER = ('rater', 'rater_email', 'form', 'subject', 'section', 'item', 'value',
+                     'submitted_utc', 'rubric_version')
+
+    def ratings_csv(self):
+        '''
+        :return: CSV text with one row per submitted rating item, header first
+        :rtype: str
+        '''
+        out = io.StringIO()
+        writer = csv.writer(out)
+        writer.writerow(self.EXPORT_HEADER)
+        for r in self.export_submitted():
+            for section, items in r['answers'].items():
+                for item, value in items.items():
+                    writer.writerow([r['rater_label'], r['rater_email'], r['form_kind'], r['subject_key'],
+                                     section, item, value, r['submitted_utc'], r['rubric_version']])
+        return out.getvalue()
 
     # ------------------------- Seen -------------------------
 

@@ -1,0 +1,34 @@
+# **********************************************************
+# @Author: Andreas Paepcke
+# @Date:   2026-10-13 17:26:44
+# @File:   /Users/paepcke/VSCodeWorkspaces/therapist-exp-evals/deploy/thtrainer-evals-backup.service
+# @Last Modified by:   Andreas Paepcke
+# @Last Modified time: 2026-10-13 17:26:44
+# **********************************************************
+
+[Unit]
+Description=Snapshot of the evaluation database
+After=thtrainer-evals.service
+
+[Service]
+Type=oneshot
+User=evals
+Group=evals
+# Snapshots must be readable by the pulling account's group, not by others:
+UMask=0027
+WorkingDirectory=/opt/therapist-exp-evals
+ExecStart=/opt/conda/envs/therapist-exp-evals/bin/python -m evals_service.evals_backup \
+    --service-root /srv/evals --backup-dir /srv/evals-backup
+
+NoNewPrivileges=yes
+ProtectSystem=strict
+ProtectHome=yes
+PrivateTmp=yes
+PrivateDevices=yes
+ProtectKernelTunables=yes
+ProtectControlGroups=yes
+RestrictSUIDSGID=yes
+RestrictAddressFamilies=AF_UNIX
+CapabilityBoundingSet=
+SystemCallFilter=@system-service
+ReadWritePaths=/srv/evals /srv/evals-backup

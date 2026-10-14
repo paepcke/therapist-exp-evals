@@ -1,0 +1,19 @@
+# **********************************************************
+# @Author: Andreas Paepcke
+# @Date:   2026-10-13 17:26:44
+# @File:   /Users/paepcke/VSCodeWorkspaces/therapist-exp-evals/deploy/thtrainer-evals-backup.timer
+# @Last Modified by:   Andreas Paepcke
+# @Last Modified time: 2026-10-13 17:26:44
+# **********************************************************
+
+[Unit]
+Description=Nightly snapshot of the evaluation database
+
+[Timer]
+OnCalendar=*-*-* 03:30:00
+RandomizedDelaySec=300
+# Run at the next boot if the machine was off at the scheduled time:
+Persistent=true
+
+[Install]
+WantedBy=timers.target
