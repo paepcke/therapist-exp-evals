@@ -1,19 +1,19 @@
 {
+  "rsync": "/opt/homebrew/bin/rsync",
   "dest_root": "~/Backups/thtrainer",
   "retry_after_hours": 12,
   "alert_after_hours": 48,
   "alert_repeat_hours": 24,
-  "mail": {
-    "smtp_host": "smtp.gmail.com",
-    "smtp_port": 587,
-    "user": "paepcke2000@gmail.com",
-    "keychain_service": "thtrainer-backup-smtp",
-    "to": "paepcke@cs.stanford.edu"
+  "ntfy": {
+    "server": "https://ntfy.sh",
+    "topic": "CHOOSE-A-LONG-RANDOM-NAME"
   },
   "sources": [
     {
       "name": "vultr-evals",
-      "remotes": ["evpull@149-28-212-36.sslip.io:/"],
+      "remotes": [
+        "evpull@149-28-212-36.sslip.io:/"
+      ],
       "ssh_key": "~/.ssh/vultr_evals_backup",
       "verify": "evals_snapshot",
       "hint": "The cloud machine is reachable from anywhere, so look at it: ssh vultr 'systemctl status thtrainer-evals-backup.timer'."

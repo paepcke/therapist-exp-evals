@@ -3,7 +3,7 @@
 # @Date:   2026-10-13 17:26:44
 # @File:   /Users/paepcke/VSCodeWorkspaces/therapist-exp-evals/src/backup_pull/backup_puller.py
 # @Last Modified by:   Andreas Paepcke
-# @Last Modified time: 2026-10-13 17:26:44
+# @Last Modified time: 2026-10-14 20:04:23
 # **********************************************************
 
 '''
@@ -21,8 +21,9 @@ A launchd job starts this every hour (deploy/com.thtrainer.backup-pull.plist). A
 is pulled again only when its last success is older than retry_after_hours, so a laptop
 that was asleep or off the Stanford VPN simply tries again at the next hour. Only when a
 source's data is older than alert_after_hours does the administrator get a macOS
-notification and an e-mail, at most once per alert_repeat_hours per source, until it is
-fixed. The e-mail goes out through Gmail SMTP; the app password lives in the macOS Keychain.
+notification and a push message to the phone (through ntfy.sh), and an e-mail if one is
+set up in the configuration, at most once per alert_repeat_hours per source, until it is
+fixed.
 
     python -m backup_pull.backup_puller [--config FILE] [--force] [--status] [--test-alert]
 
@@ -40,6 +41,8 @@ import smtplib
 import sqlite3
 import subprocess
 import sys
+import urllib.error
+import urllib.request
 from datetime import datetime, timedelta, timezone
 from email.message import EmailMessage
 from pathlib import Path
@@ -63,6 +66,13 @@ class PullConfig:
         'alert_after_hours': 48,
         'alert_repeat_hours': 24,
         'timeout_secs': 600,
+        # The rsync program. macOS ships openrsync, which the cloud machine's rrsync
+        # refuses; use rsync 3.x (brew install rsync) there, e.g. /opt/homebrew/bin/rsync.
+        'rsync': 'rsync',
+        # Push messages to the phone through ntfy (https://ntfy.sh). The topic name is the
+        # secret: anybody who knows it can read the messages, so make it long and random.
+        'ntfy': {'server': 'https://ntfy.sh', 'topic': ''},
+        # E-mail is optional: it is sent only when 'user' and 'to' are set.
         'mail': {
             'smtp_host': 'smtp.gmail.com',
             'smtp_port': 587,
@@ -80,8 +90,8 @@ class PullConfig:
         '''
         merged = json.loads(json.dumps(self.DEFAULTS))
         for key, value in doc.items():
-            if key == 'mail':
-                merged['mail'].update(value)
+            if key in ('mail', 'ntfy'):
+                merged[key].update(value)
             else:
                 merged[key] = value
         self.dest_root = Path(os.path.expanduser(merged['dest_root']))
@@ -89,7 +99,9 @@ class PullConfig:
         self.alert_after = timedelta(hours=float(merged['alert_after_hours']))
         self.alert_repeat = timedelta(hours=float(merged['alert_repeat_hours']))
         self.timeout_secs = int(merged['timeout_secs'])
+        self.rsync = os.path.expanduser(merged['rsync'])
         self.mail = merged['mail']
+        self.ntfy = merged['ntfy']
         sources = merged.get('sources')
         if not sources or not isinstance(sources, list):
             raise ValueError("config needs a non-empty list 'sources'")
@@ -183,34 +195,53 @@ class RsyncRunner:
         except subprocess.TimeoutExpired as e:
             raise RuntimeError(f"rsync took longer than {self.timeout_secs} seconds") from e
         if done.returncode != 0:
-            raise RuntimeError(f"rsync exited with {done.returncode}: {(done.stderr or '').strip()[-300:]}")
+            message = f"rsync exited with {done.returncode}: {(done.stderr or '').strip()[-300:]}"
+            if 'invalid rsync-command' in (done.stderr or ''):
+                message += (" -- The macOS rsync (openrsync) is not accepted by the cloud machine's rrsync. "
+                            "Install rsync 3.x (brew install rsync) and set \"rsync\" in the config "
+                            "to its full path.")
+            raise RuntimeError(message)
 
 
 class Notifier:
     '''
-    Tells the administrator: a macOS notification and an e-mail. Replaceable in tests.
+    Tells the administrator, over every channel that is set up: a macOS notification,
+    a push message to the phone (ntfy), and optionally an e-mail. Replaceable in tests.
     '''
 
-    def __init__(self, mail):
+    def __init__(self, mail, ntfy=None):
         '''
         :param mail: the 'mail' section of the config
         :type mail: dict
+        :param ntfy: the 'ntfy' section of the config
+        :type ntfy: optional[dict]
         '''
         self.mail = mail
+        self.ntfy = ntfy or {}
         self.log = logging.getLogger('backup_pull')
 
-    def send(self, subject, body):
+    def send(self, subject, body, short=None):
         '''
         :param subject: short text
         :type subject: str
-        :param body: longer text
+        :param body: longer text, for e-mail
         :type body: str
+        :param short: text for the phone; default the body's first line
+        :type short: optional[str]
         :return: True if at least one channel worked
         :rtype: bool
         '''
-        shown = self._notification(subject, body.splitlines()[0] if body else '')
-        mailed = self._email(subject, body)
-        return shown or mailed
+        return any(v for v in self.send_each(subject, body, short).values())
+
+    def send_each(self, subject, body, short=None):
+        '''
+        :return: for each channel True (sent), False (failed) or None (not set up)
+        :rtype: dict[str, optional[bool]]
+        '''
+        first_line = body.splitlines()[0] if body else ''
+        return {'notification': self._notification(subject, first_line),
+                'push': self._push(subject, short if short is not None else first_line),
+                'email': self._email(subject, body)}
 
     def _notification(self, title, text):
         script = 'display notification "{}" with title "{}"'.format(self._q(text), self._q(title))
@@ -225,17 +256,30 @@ class Notifier:
     def _q(text):
         return text.replace('\\', '\\\\').replace('"', '\\"')
 
+    def _push(self, title, text):
+        topic = self.ntfy.get('topic')
+        if not topic:
+            return None
+        url = f"{self.ntfy.get('server', 'https://ntfy.sh').rstrip('/')}/{topic}"
+        request = urllib.request.Request(url, data=text.encode('utf-8'), method='POST',
+                                         headers={'Title': title, 'Priority': 'high', 'Tags': 'warning'})
+        try:
+            with urllib.request.urlopen(request, timeout=30) as reply:
+                return 200 <= reply.status < 300
+        except (OSError, urllib.error.URLError) as e:
+            self.log.warning("Push message failed: %s", e)
+            return False
+
     def _password(self):
         done = subprocess.run(['security', 'find-generic-password', '-a', self.mail['user'],
                                '-s', self.mail['keychain_service'], '-w'],
                               capture_output=True, text=True, timeout=30, check=True)
-        return done.stdout.strip()
+        return done.stdout.strip().replace(' ', '')       # Google shows app passwords with spaces
 
     def _email(self, subject, body):
         m = self.mail
         if not m.get('user') or not m.get('to'):
-            self.log.warning("No mail settings; not sending e-mail")
-            return False
+            return None
         msg = EmailMessage()
         msg['From'], msg['To'], msg['Subject'] = m['user'], m['to'], subject
         msg.set_content(body)
@@ -316,8 +360,8 @@ class BackupPuller:
         :type clock: optional[callable]
         '''
         self.config = config
-        self.runner = runner or RsyncRunner(config.timeout_secs)
-        self.notifier = notifier or Notifier(config.mail)
+        self.runner = runner or RsyncRunner(config.timeout_secs, config.rsync)
+        self.notifier = notifier or Notifier(config.mail, config.ntfy)
         self.clock = clock or (lambda: datetime.now(timezone.utc))
         config.dest_root.mkdir(parents=True, exist_ok=True, mode=0o700)
         os.chmod(config.dest_root, 0o700)
@@ -403,8 +447,20 @@ class BackupPuller:
                 continue
             subject, body = self._message(source, state, age)
             self.LOG.error("%s", subject)
-            self.notifier.send(subject, body)
+            self.notifier.send(subject, body, short=self._short(source, subject))
             state['last_alert_utc'] = StatusFile.text(now)
+
+    @staticmethod
+    def _short(source, subject):
+        '''
+        :return: the text for the phone: what is wrong and what to do, nothing about hosts or errors
+        :rtype: str
+        '''
+        lines = [subject]
+        if source.get('hint'):
+            lines.append(source['hint'])
+        lines.append("The laptop retries hourly; details are in ~/Backups/thtrainer/backup_pull.log.")
+        return ' '.join(lines)
 
     def _message(self, source, state, age):
         name = source['name']
@@ -470,7 +526,7 @@ class BackupPuller:
         parser.add_argument('--config', default=None)
         parser.add_argument('--force', action='store_true', help='pull every source now')
         parser.add_argument('--status', action='store_true', help='only show the state of each source')
-        parser.add_argument('--test-alert', action='store_true', help='send a test notification and e-mail')
+        parser.add_argument('--test-alert', action='store_true', help='send a test message over every channel that is set up')
         args = parser.parse_args(argv)
         try:
             config = PullConfig.load(args.config)
@@ -484,10 +540,11 @@ class BackupPuller:
                                       logging.handlers.RotatingFileHandler(config.dest_root / cls.LOG_NAME,
                                                                            maxBytes=1_000_000, backupCount=3)])
         if args.test_alert:
-            ok = Notifier(config.mail).send('[thtrainer backup] test',
-                                            'If you read this, backup reminders reach you.\n')
-            print('Sent.' if ok else 'Neither the notification nor the e-mail could be sent; see the log.')
-            return 0 if ok else 1
+            result = Notifier(config.mail, config.ntfy).send_each(
+                '[thtrainer backup] test', 'If you read this, backup reminders reach you.\n')
+            for channel, ok in result.items():
+                print(f"{channel:<13} {'not set up' if ok is None else ('sent' if ok else 'FAILED (see the log)')}")
+            return 0 if any(result.values()) else 1
         lock = open(config.dest_root / cls.LOCK_NAME, 'w')
         try:
             fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)

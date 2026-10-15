@@ -10,8 +10,8 @@ What is protected, and where the copies end up:
 
 Sparky pulls all of this every hour into `~/Backups/thtrainer/`, where Time Machine and the AWS
 bucket pick it up. Sparky also checks every pull. When a source's newest data is more than
-48 hours old, it shows a macOS notification and e-mails paepcke@cs.stanford.edu, again every
-24 hours until it is fixed. Away from Stanford, quatro is reachable only through the VPN: start it,
+48 hours old, it shows a macOS notification and sends a push message to your phone (through
+ntfy.sh), again every 24 hours until it is fixed. E-mail is possible but optional. Away from Stanford, quatro is reachable only through the VPN: start it,
 and the next hourly run (or `--force`) catches up.
 
 Important: both the ratings and the secret can identify people. The Time Machine disk and the
@@ -68,30 +68,59 @@ Commands run as the administrator, with `sudo`.
 
 ## Part B: sparky
 
+First, a newer rsync. The rsync that macOS ships is `openrsync`, and the cloud machine's restricted
+upload account rejects it ("invalid rsync-command syntax or options"). Install rsync 3.x and check it;
+the first line must say `rsync  version 3.`:
+
+    brew install rsync
+    /opt/homebrew/bin/rsync --version | head -1
+
+The example configuration below names `/opt/homebrew/bin/rsync` (`"rsync"` setting). On an
+Intel Mac, brew installs to `/usr/local/bin/rsync`: change the setting then. Use it for the
+pull test in step 3 of Part A as well:
+
+    rsync_path=/opt/homebrew/bin/rsync
+    mkdir -p /tmp/pulltest && $rsync_path -rtv -e "ssh -i ~/.ssh/vultr_evals_backup -o IdentitiesOnly=yes" evpull@149-28-212-36.sslip.io:/ /tmp/pulltest/
+
 1. The configuration. Copy the example, then edit nothing unless your paths differ. It names
-   the two sources and the e-mail settings. The code is the `backup_pull` package of this repository; the
+   the two sources and the phone topic. The code is the `backup_pull` package of this repository; the
    conda environment has it once the repository is installed in it (`pip install -e .`).
    
         cd ~/VSCodeWorkspaces/therapist-exp-evals && conda activate therapist-exp-evals && pip install -e .
         mkdir -p ~/.thtrainer ~/Backups/thtrainer
         cp deploy/backup_pull.example.json ~/.thtrainer/backup_pull.json
 
-2. The mail password. Gmail needs an app password (Google account, Security, 2-Step
-   Verification, App passwords; name it `thtrainer backup`). Store it in the Keychain; the
-   command prompts for it. `-T` lets the `security` tool read it without a dialog, which a
-   background job needs.
+2. The phone. Reminders go to your phone through ntfy.sh, a free push service: you install its
+   app, subscribe to one secret topic name, and sparky posts to that name. Anybody who knows the
+   name can read the messages, so it must be long and random. The messages say only what is
+   stale and what to do, nothing about hosts or data. Make the name:
    
-        security add-generic-password -a paepcke2000@gmail.com -s thtrainer-backup-smtp -T /usr/bin/security -w
+        python -c "import secrets; print('thtrainer-backup-' + secrets.token_urlsafe(18))"
+   
+    Put the result in `~/.thtrainer/backup_pull.json`, in place of `CHOOSE-A-LONG-RANDOM-NAME`
+    in the `ntfy` block. On the phone, install the **ntfy** app (App Store or Google Play),
+    tap "+" and subscribe to exactly that topic name on the default server (ntfy.sh). Allow
+    notifications for the app.
 
-3. Test that reminders reach you. A notification must appear and an e-mail must arrive at
-   paepcke@cs.stanford.edu (look in the spam folder once; mark it not spam):
+3. Test that reminders reach you. A notification must appear on sparky and a message
+   "[thtrainer backup] test" on the phone. The command prints one line per channel:
    
         conda activate therapist-exp-evals
         python -m backup_pull.backup_puller --test-alert
 
+    To get e-mail too, add a `mail` block to the configuration (`user`, `to`, and optionally
+    `smtp_host`, `smtp_port`, `keychain_service`), and store the SMTP password in the Keychain
+    with `security add-generic-password -a <user> -s thtrainer-backup-smtp -T /usr/bin/security -w`.
+    Gmail did not work from this laptop (it hung up when the login arrived), which is why push
+    is the default.
+
 4. A first pull by hand, on the Stanford network or VPN (quatro is needed):
    
         python -m backup_pull.backup_puller --force
+   
+    The sampling-state file exists on quatro only after the first bundle has been built. Until
+    then, delete its line from the `quatro-secrets` remotes in your configuration (and the comma
+    after the line above it), and put it back after the first bundle.
    
     The report shows `newest data 0 hours old` for both sources. Look at
     `~/Backups/thtrainer`: `vultr-evals` has the snapshots, `quatro-secrets` the two files.
@@ -123,7 +152,7 @@ Commands run as the administrator, with `sudo`.
   machine stopped. Run `systemctl status thtrainer-evals-backup.service` there.
 * **never been backed up**: the first pull has not succeeded yet.
 
-If sparky is asleep or off, nothing runs and nothing is sent. The first run after it wakes does the
+If sparky is asleep or off, nothing runs and nothing is sent (the phone message comes from sparky too). The first run after it wakes does the
 catch-up. Over a long trip, that is the gap the 48 hours cannot cover.
 
 ## Restoring

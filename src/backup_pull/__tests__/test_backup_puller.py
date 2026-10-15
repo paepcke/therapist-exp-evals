@@ -3,7 +3,7 @@
 # @Date:   2026-10-13 17:26:44
 # @File:   /Users/paepcke/VSCodeWorkspaces/therapist-exp-evals/src/backup_pull/__tests__/test_backup_puller.py
 # @Last Modified by:   Andreas Paepcke
-# @Last Modified time: 2026-10-13 17:26:44
+# @Last Modified time: 2026-10-14 20:04:23
 # **********************************************************
 
 '''
@@ -15,10 +15,12 @@ import json
 import shutil
 import tempfile
 import unittest
+from unittest import mock
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
-from backup_pull.backup_puller import BackupPuller, PullConfig, SnapshotVerifier, StatusFile, VerifyError
+from backup_pull.backup_puller import (BackupPuller, Notifier, PullConfig, RsyncRunner, SnapshotVerifier,
+                                       StatusFile, VerifyError)
 from evals_service.eval_store import EvalStore
 from evals_service.evals_backup import EvalsBackup
 
@@ -48,9 +50,11 @@ class FakeNotifier:
 
     def __init__(self):
         self.sent = []
+        self.shorts = []
 
-    def send(self, subject, body):
+    def send(self, subject, body, short=None):
         self.sent.append((subject, body))
+        self.shorts.append(short)
         return True
 
 
@@ -203,6 +207,63 @@ class PullerTests(unittest.TestCase):
             PullConfig({'sources': [{'name': 'x'}]})
         with self.assertRaises(ValueError):
             PullConfig({'sources': [{'name': 'x', 'remotes': ['a'], 'verify': 'magic'}]})
+
+    def test_rsync_program_is_configurable(self):
+        config = PullConfig({'rsync': '~/bin/rsync3', 'sources': [{'name': 'x', 'remotes': ['a']}]})
+        self.assertTrue(config.rsync.endswith('/bin/rsync3'))
+        self.assertNotIn('~', config.rsync)
+        self.assertEqual(self.config.rsync, 'rsync')
+        self.assertEqual(BackupPuller(config).runner.rsync, config.rsync)
+
+    def test_openrsync_refusal_gets_a_hint(self):
+        done = mock.Mock(returncode=1, stderr='/usr/bin/rrsync error: invalid rsync-command syntax or options')
+        with mock.patch('subprocess.run', return_value=done) as run:
+            with self.assertRaisesRegex(RuntimeError, 'brew install rsync'):
+                RsyncRunner(rsync='/opt/homebrew/bin/rsync').pull('u@h:/', self.tmp)
+        self.assertEqual(run.call_args[0][0][0], '/opt/homebrew/bin/rsync')
+
+    def test_alert_carries_a_short_text_for_the_phone(self):
+        self.runner.failing[self.VULTR] = 'ssh: connect to host secret.example.org port 22'
+        self.puller().run()
+        short = self.notifier.shorts[0]
+        self.assertIn('vultr-evals has never been backed up', short)
+        self.assertNotIn('secret.example.org', short)
+
+    def test_push_posts_to_the_topic(self):
+        notifier = Notifier({}, {'server': 'https://ntfy.example/', 'topic': 'abc123'})
+        reply = mock.MagicMock()
+        reply.__enter__.return_value.status = 200
+        with mock.patch('urllib.request.urlopen', return_value=reply) as urlopen:
+            self.assertTrue(notifier._push('[thtrainer backup] test', 'hello'))
+        request = urlopen.call_args[0][0]
+        self.assertEqual(request.full_url, 'https://ntfy.example/abc123')
+        self.assertEqual(request.data, b'hello')
+        self.assertEqual(request.get_header('Title'), '[thtrainer backup] test')
+
+    def test_channels_that_are_not_set_up_are_reported_as_such(self):
+        notifier = Notifier({}, {})
+        self.assertIsNone(notifier._push('t', 'x'))
+        self.assertIsNone(notifier._email('t', 'x'))
+
+    def test_push_failure_is_reported_not_raised(self):
+        notifier = Notifier({}, {'topic': 'abc123'})
+        with mock.patch('urllib.request.urlopen', side_effect=OSError('down')):
+            self.assertFalse(notifier._push('t', 'x'))
+
+    def test_send_succeeds_if_any_channel_works(self):
+        notifier = Notifier({}, {'topic': 'abc123'})
+        with mock.patch.object(Notifier, '_notification', return_value=False), \
+                mock.patch.object(Notifier, '_push', return_value=True):
+            self.assertTrue(notifier.send('t', 'b'))
+        with mock.patch.object(Notifier, '_notification', return_value=False), \
+                mock.patch.object(Notifier, '_push', return_value=False):
+            self.assertFalse(notifier.send('t', 'b'))
+
+    def test_app_password_spaces_are_dropped(self):
+        notifier = Notifier({'user': 'u', 'keychain_service': 's'})
+        done = mock.Mock(stdout='abcd efgh ijkl mnop\n')
+        with mock.patch('subprocess.run', return_value=done):
+            self.assertEqual(notifier._password(), 'abcdefghijklmnop')
 
     def test_status_file_survives_garbage(self):
         p = self.tmp / 's.json'
